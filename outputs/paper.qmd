@@ -1,0 +1,65 @@
+---
+title: "Aussie PMs"
+subtitle: "Dead or Alive?"
+author: "Michaela Drouillard"
+thanks: "Code and data are available at: LINK."
+date: "1 March 2023"
+abstract: "I've scraped the Wikipedia for Australian Prime Ministers and visualized their birth and death dates"
+format: pdf
+
+---
+
+
+```{r}
+#| echo: false
+#| warning: false
+#| tbl-cap: Aussie Prime Ministers, by how old they were when they died
+#| label: tbl-table
+
+
+cleaned_data<- readRDS(here::here("inputs/data/cleaned_data.rds"))
+cleaned_data |>
+  head() |>
+  knitr::kable(
+    col.names = c("Prime Minister", 
+                  "Birth year", 
+                  "Death year", 
+                  "Age at death")
+  )
+
+```
+
+
+```{r}
+#| echo: false
+#| warning: false
+#| fig-cap: How long each UK prime minister lived
+#| label: fig-chart
+library(ggplot2)
+library(dplyr)
+
+cleaned_data |>
+  mutate(
+    still_alive = if_else(is.na(died), "Yes", "No"),
+    died = if_else(is.na(died), as.integer(2023), died)
+  ) |>
+  mutate(name = as_factor(name)) |>
+  ggplot(aes(
+    x = born,
+    xend = died,
+    y = name,
+    yend = name,
+    color = still_alive
+  )) +
+  geom_segment() +
+  labs(
+    x = "Year of birth",
+    y = "Prime minister",
+    color = "PM is currently alive",
+    title = "How long each Aussie Prime Minister lived, by year of birth"
+  ) +
+  theme_minimal() +
+  scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
+```
+
