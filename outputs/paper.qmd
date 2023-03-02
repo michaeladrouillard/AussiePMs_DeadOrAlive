@@ -8,6 +8,22 @@ abstract: "I've scraped the Wikipedia for Australian Prime Ministers to visualiz
 format: pdf
 ---
 
+#### Gathering Data
+
+My data source was the [Wikipedia page](https://en.wikipedia.org/wiki/List_of_prime_ministers_of_Australia) for "List of prime ministers of Australia". Using the "read_html" function in the rvest package in R, I read the HTML content from the Wikipedia page. I wrote the content into a local file named "pms.html", and then read it in again, and named it raw_data.
+
+I used the "html_element" and "html_table" functions from the rvest package to extract data from the HTML content. "html_element" extracts the HTML element with class ".wikitable", and the "html_table" function converts it into a dataframe. I saved both the raw data and the parsed data as RDS files.
+
+#### Cleaning Data
+
+I used the clean_names function from the janitor package in R to clean the column names in parse_data_selector_gadget, and stored it as a new table. Then, I selected only the column of interest, which was title name_birth_death_constituency. The values in the column contained the data of interest: the prime ministers names, and their birth and death dates. I removed the first row, which was a duplicate of the column headings.
+
+I used the "separate" function to split names from birth and death fates at the first "(" character, creating "name" and "not_name" columns. I used the "str_extract" function from the stringr package to extract the values for two new columns, "date" and "born", from the "not_name" column. I then used the "mutate" function to remove the "b." text from the "born" column for prime minister who are still alive. Then, I used select to only select the "name", "date", and "born" columns.
+
+Then, I used the "separate" function again to split the "date" column into "birth" and "died" columns at the "-" character. I used "str_remove"all" from the stringr package to remove the "b." text from the "born" column, and the "if_else" function to replace missing values from the "birth" column with values from the "born" column. (These discrepancies came from the way that dead Prime Ministers and alive Prime Ministers dates were recorded). Then, I turned the born and died columns in integers, and calculated the "Age_at_Death" column by taking the difference between "died" and "born". The "distinct" function removes any duplicate rows.
+
+#### Results
+
 ```{r}
 #| echo: false
 #| warning: false
@@ -32,6 +48,7 @@ cleaned_data |>
 #| warning: false
 #| fig-cap: How long each UK prime minister lived
 #| label: fig-chart
+#| height: 10
 library(ggplot2)
 library(dplyr)
 library(forcats)
@@ -54,26 +71,12 @@ cleaned_data |>
     x = "Year of birth",
     y = "Prime minister",
     color = "PM is currently alive",
-    title = "How long each Aussie Prime Minister lived, by year of birth"
+    title = "How long each Aussie Prime Minister lived"
   ) +
   theme_minimal() +
   scale_color_brewer(palette = "Set1") +
   theme(legend.position = "bottom")
 ```
-
-#### Gathering Data
-
-My data source was the [Wikipedia page](https://en.wikipedia.org/wiki/List_of_prime_ministers_of_Australia) for "List of prime ministers of Australia". Using the "read_html" function in the rvest package in R, I read the HTML content from the Wikipedia page. I wrote the content into a local file named "pms.html", and then read it in again, and named it raw_data.
-
-I used the "html_element" and "html_table" functions from the rvest package to extract data from the HTML content. "html_element" extracts the HTML element with class ".wikitable", and the "html_table" function converts it into a dataframe. I saved both the raw data and the parsed data as RDS files.
-
-#### Cleaning Data
-
-I used the clean_names function from the janitor package in R to clean the column names in parse_data_selector_gadget, and stored it as a new table. Then, I selected only the column of interest, which was title name_birth_death_constituency. The values in the column contained the data of interest: the prime ministers names, and their birth and death dates. I removed the first row, which was a duplicate of the column headings.
-
-I used the "separate" function to split names from birth and death fates at the first "(" character, creating "name" and "not_name" columns. I used the "str_extract" function from the stringr package to extract the values for two new columns, "date" and "born", from the "not_name" column. I then used the "mutate" function to remove the "b." text from the "born" column for prime minister who are still alive. Then, I used select to only select the "name", "date", and "born" columns.
-
-Then, I used the "separate" function again to split the "date" column into "birth" and "died" columns at the "-" character. I used "str_remove"all" from the stringr package to remove the "b." text from the "born" column, and the "if_else" function to replace missing values from the "birth" column with values from the "born" column. (These discrepancies came from the way that dead Prime Ministers and alive Prime Ministers dates were recorded). Then, I turned the born and died columns in integers, and calculated the "Age_at_Death" column by taking the difference between "died" and "born". The "distinct" function removes any duplicate rows.
 
 #### Discussion
 
@@ -91,7 +94,11 @@ I think in the future, I would actually write the code from scratch and not just
 
 #### Back to the Aussies
 
-Gough Whitlam has the longest lifespan of any Australian prime minister. Harold Holt, so far, has the shortest. The average lifespan is 77.86 years.
+Gough Whitlam has the longest lifespan of any Australian prime minister. He died at 98 of natural causes. Harold Holt, so far, has the shortest. He disappeared while swimming at Cheviot Beach near Portsea, Victoria, Australia, on December 17, 1867, and his body was never found[^1].
+
+[^1]: Omg. I swear to god I was just joking around when I first started this project and put the repo description as "scraping wiki to figure out which Aussie PMs are alive, which ones are dead, and which ones are FAKING IT (kidding) (unless\....?)". I had no idea about Holt. Obviously this is tragic. But a part of me hopes that he's faking it, and that I'm accidentally the whistle blower.
+
+The average lifespan of an Australian Prime Minister is 77.86 years, and all but one have been men.
 
 ```{r}
 #| echo: false
@@ -112,10 +119,9 @@ cleaned_data |>
   )
 ```
 
-
 In @tbl-table3, we can observe that, of the living Prime Ministers, John Howard has already been alive for slightly longer than the average lifespan.
 
-```{r} 
+```{r}
 #| echo: false
 #| warning: false
 #| tbl-cap: Ages of Living Prime Ministers
