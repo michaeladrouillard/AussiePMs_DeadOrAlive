@@ -83,7 +83,7 @@ cleaned_data |>
 
 Surprisingly, not much in the actual scraping took longer than expected. I was using your example, and the structure was very similar. I only had to change a few lines to have the right values and column titles. The exact moment it became fun was when I gave it a stupid description in the GitHub repo.
 
-What is taking much longer than expected is rendering this damn thing into a PDF. My RStudio is encountering issues with the "as_factor" function in the ggplot code [@citegg].
+What is taking much longer than expected is rendering the damn thing into a PDF. My RStudio is encountering issues with the "as_factor" function in the ggplot code [@citegg].
 
 Oh wait.
 
