@@ -6,21 +6,22 @@ thanks: "Code and data are available at: https://github.com/michaeladrouillard/A
 date: "1 March 2023"
 abstract: "I've scraped the Wikipedia for Australian Prime Ministers to visualize their birth and death dates. This is for Tutorial 7."
 format: pdf
+bibliography: bib.bib
 ---
 
 #### Gathering Data
 
-My data source was the [Wikipedia page](https://en.wikipedia.org/wiki/List_of_prime_ministers_of_Australia) for "List of prime ministers of Australia". Using the "read_html" function in the rvest package in R, I read the HTML content from the Wikipedia page. I wrote the content into a local file named "pms.html", and then read it in again, and named it raw_data.
+My data source was the [Wikipedia page](https://en.wikipedia.org/wiki/List_of_prime_ministers_of_Australia) for "List of prime ministers of Australia". Using the "read_html" function in the rvest \[@citervest\] package in R [@citeR], I read the HTML content from the Wikipedia page. I wrote the content into a local file named "pms.html", and then read it in again, and named it raw_data.
 
 I used the "html_element" and "html_table" functions from the rvest package to extract data from the HTML content. "html_element" extracts the HTML element with class ".wikitable", and the "html_table" function converts it into a dataframe. I saved both the raw data and the parsed data as RDS files.
 
 #### Cleaning Data
 
-I used the clean_names function from the janitor package in R to clean the column names in parse_data_selector_gadget, and stored it as a new table. Then, I selected only the column of interest, which was title name_birth_death_constituency. The values in the column contained the data of interest: the prime ministers names, and their birth and death dates. I removed the first row, which was a duplicate of the column headings.
+I used the clean_names function from the janitor package in R to clean the column names in parse_data_selector_gadget, and stored it as a new table [@janitor]. Then, I selected only the column of interest, which was title name_birth_death_constituency. The values in the column contained the data of interest: the prime ministers names, and their birth and death dates. I removed the first row, which was a duplicate of the column headings.
 
-I used the "separate" function to split names from birth and death fates at the first "(" character, creating "name" and "not_name" columns. I used the "str_extract" function from the stringr package to extract the values for two new columns, "date" and "born", from the "not_name" column. I then used the "mutate" function to remove the "b." text from the "born" column for prime minister who are still alive. Then, I used select to only select the "name", "date", and "born" columns.
+I used the "separate" function from the tidyr package to split names from birth and death fates at the first "(" character, creating "name" and "not_name" columns [@citetidy]. I used the "str_extract" function from the stringr package [@citestringr] to extract the values for two new columns, "date" and "born", from the "not_name" column. I then used the "mutate" function to remove the "b." text from the "born" column for prime minister who are still alive. Then, I used select to only select the "name", "date", and "born" columns.
 
-Then, I used the "separate" function again to split the "date" column into "birth" and "died" columns at the "-" character. I used "str_remove"all" from the stringr package to remove the "b." text from the "born" column, and the "if_else" function to replace missing values from the "birth" column with values from the "born" column. (These discrepancies came from the way that dead Prime Ministers and alive Prime Ministers dates were recorded). Then, I turned the born and died columns in integers, and calculated the "Age_at_Death" column by taking the difference between "died" and "born". The "distinct" function removes any duplicate rows.
+Then, I used the "separate" function again to split the "date" column into "birth" and "died" columns at the "-" character. I used "str_remove"all" from the stringr package to remove the "b." text from the "born" column, and the "if_else" function to replace missing values from the "birth" column with values from the "born" column. (These discrepancies came from the way that dead Prime Ministers and alive Prime Ministers dates were recorded). Then, I turned the born and died columns in integers, and calculated the "Age_at_Death" column by taking the difference between "died" and "born". The "distinct" function from the dplyr package removes any duplicate rows [@citedplyr].
 
 #### Results
 
@@ -82,13 +83,13 @@ cleaned_data |>
 
 Surprisingly, not much in the actual scraping took longer than expected. I was using your example, and the structure was very similar. I only had to change a few lines to have the right values and column titles. The exact moment it became fun was when I gave it a stupid description in the GitHub repo.
 
-What is taking much longer than expected is rendering this damn thing into a PDF. My RStudio is encountering issues with the "as_factor" function in the ggplot code.
+What is taking much longer than expected is rendering this damn thing into a PDF. My RStudio is encountering issues with the "as_factor" function in the ggplot code [@citegg].
 
 Oh wait.
 
 I can now shift to past tense because I JUST resolved the issue.
 
-After loading the forcats library in the paper.qmd file, I was able to render the file as a PDF.
+After loading the forcats library [@citeforcats] in the paper.qmd file, I was able to render the file as a PDF.
 
 I think in the future, I would actually write the code from scratch and not just modify your chunks of code. I always kick myself when I copy paste code because I'm not searing it into my brain the way I should be at this stage of learning.
 
@@ -143,3 +144,7 @@ cleaned_data2 |>
   )
 
 ```
+
+#### References
+::: {#refs}
+:::
